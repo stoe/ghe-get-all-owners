@@ -18,6 +18,10 @@ for platform in "${platforms[@]}"; do
         output_name+="-${GOARCH}.exe"
     fi
 
+    if [ "${GOOS}" = "linux" ]; then
+        output_name+="-${GOOS}"
+    fi
+
     [ ! -d "./build/${GOOS}" ] && mkdir -p "./build/${GOOS}"
 
     env GOOS="${GOOS}" GOARCH="${GOARCH}" go build -o "./build/${GOOS}/${output_name}" . || {
