@@ -1,5 +1,7 @@
 # ghe-get-all-owners
 
+[![build](https://github.com/stoe/ghe-get-all-owners/workflows/build/badge.svg)](https://github.com/stoe/ghe-get-all-owners/actions?query=workflow%3Abuild) [![release](https://github.com/stoe/ghe-get-all-owners/workflows/release/badge.svg)](https://github.com/stoe/ghe-get-all-owners/actions?query=workflow%3Arelease)
+
 ## Usage
 
 ```sh
