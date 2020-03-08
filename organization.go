@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	graphql "github.com/shurcooL/githubv4"
 )
@@ -13,7 +11,7 @@ type organization struct {
 }
 
 var (
-	organizationsQuery struct {
+	oQuery struct {
 		Organizations struct {
 			Nodes    []organization
 			PageInfo struct {
@@ -26,28 +24,25 @@ var (
 	organizations []organization
 )
 
-func getOrganizations() ([]organization, int) {
+func getOrganizations() (o []organization) {
 	variables := map[string]interface{}{
 		"organizationsPage": (*graphql.String)(nil),
 	}
 
 	for {
-		err := graphqlClient.Query(context.Background(), &organizationsQuery, variables)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %s\n", red(err))
-			os.Exit(1)
+		if err := graphqlClient.Query(context.Background(), &oQuery, variables); err != nil {
+			errorAndExit(err)
 		}
 
-		organizations = append(organizations, organizationsQuery.Organizations.Nodes...)
+		o = append(o, oQuery.Organizations.Nodes...)
 
 		// break on last page
-		if !organizationsQuery.Organizations.PageInfo.HasNextPage {
+		if !oQuery.Organizations.PageInfo.HasNextPage {
 			break
 		}
 
-		variables["organizationsPage"] = graphql.NewString(organizationsQuery.Organizations.PageInfo.EndCursor)
+		variables["organizationsPage"] = graphql.NewString(oQuery.Organizations.PageInfo.EndCursor)
 	}
 
-	return organizations, len(organizations)
+	return
 }

@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
-	"os"
 
 	graphql "github.com/shurcooL/githubv4"
 )
@@ -17,7 +15,7 @@ type member struct {
 }
 
 var (
-	enterpriseQuery struct {
+	eQuery struct {
 		Enterprise struct {
 			Members struct {
 				PageInfo struct {
@@ -39,20 +37,17 @@ func getOwners(login graphql.String, c chan []member) {
 	}
 
 	for {
-		err := graphqlClient.Query(context.Background(), &enterpriseQuery, variables)
-
-		if err != nil {
-			fmt.Fprintf(os.Stderr, "error: %s\n", red(err))
-			os.Exit(1)
+		if err := graphqlClient.Query(context.Background(), &eQuery, variables); err != nil {
+			errorAndExit(err)
 		}
-		members = enterpriseQuery.Enterprise.Members.Nodes
+		members = eQuery.Enterprise.Members.Nodes
 
 		// break on last page
-		if !enterpriseQuery.Enterprise.Members.PageInfo.HasNextPage {
+		if !eQuery.Enterprise.Members.PageInfo.HasNextPage {
 			break
 		}
 
-		variables["memberPage"] = graphql.NewString(enterpriseQuery.Enterprise.Members.PageInfo.EndCursor)
+		variables["memberPage"] = graphql.NewString(eQuery.Enterprise.Members.PageInfo.EndCursor)
 	}
 
 	c <- members
